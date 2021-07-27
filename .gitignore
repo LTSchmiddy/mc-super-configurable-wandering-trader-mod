@@ -1,0 +1,10 @@
+# Directories:
+/.gradle/
+/.settings/
+/.vscode/
+/bin/
+/run/
+
+# Files:
+/.classpath
+/.project
