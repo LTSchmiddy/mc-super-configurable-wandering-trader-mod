@@ -4,6 +4,7 @@
 /.vscode/
 /bin/
 /run/
+/build/
 
 # Files:
 /.classpath
