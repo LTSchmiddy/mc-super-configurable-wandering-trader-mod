@@ -2,7 +2,7 @@ package net.hyper_pigeon.better_wandering_trader;
 
 import java.util.Random;
 
-import net.hyper_pigeon.better_wandering_trader.BetterWanderingTraderConfig.TradeFormat;
+import net.hyper_pigeon.better_wandering_trader.config.TradeFormat;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;

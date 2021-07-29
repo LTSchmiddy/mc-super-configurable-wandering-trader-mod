@@ -5,6 +5,7 @@ import io.github.prospector.modmenu.api.ModMenuApi;
 import me.shedaniel.autoconfig.AutoConfig;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.hyper_pigeon.better_wandering_trader.config.BetterWanderingTraderConfig;
 import net.minecraft.client.gui.screen.Screen;
 
 @Environment(EnvType.CLIENT)

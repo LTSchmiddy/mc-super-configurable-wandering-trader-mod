@@ -34,10 +34,10 @@ public class TraderOffersMixin {
             )
         );
 
-        if (BetterWanderingTraderMod.CONFIG.trades.enable_user_added_traded) {
+        // if (BetterWanderingTraderMod.CONFIG.trades.enable_user_added_trades) {
 
-            WANDERING_TRADER_TRADES.put(3, BetterWanderingTraderMod.CONFIG.invisibleTradeFactory.toTradeFactory());
-        }
+        //     WANDERING_TRADER_TRADES.put(3, BetterWanderingTraderMod.CONFIG.invisibleTradeFactory.toTradeFactory());
+        // }
 
         System.out.println("WT Trades Loaded!");
     }
