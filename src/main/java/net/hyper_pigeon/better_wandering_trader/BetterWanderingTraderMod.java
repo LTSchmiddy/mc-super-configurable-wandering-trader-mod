@@ -65,6 +65,10 @@ public class BetterWanderingTraderMod implements ModInitializer, ServerStarted, 
 		UserTradeListConfigHandler.loadAll(CONFIG.trades.user_trade_lists_folder);
 	}
 
+	public static void checkUserTrades() {
+		UserTradeListConfigHandler.checkAll(CONFIG.trades.user_trade_lists_folder);
+	}
+
 
 
 }

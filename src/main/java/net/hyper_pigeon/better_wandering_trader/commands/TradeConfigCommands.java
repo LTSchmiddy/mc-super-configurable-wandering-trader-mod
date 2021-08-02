@@ -14,5 +14,10 @@ public class TradeConfigCommands {
             return 1;
         }));
 
+        dispatcher.register(CommandManager.literal("check_user_trades").executes(context -> {
+            BetterWanderingTraderMod.checkUserTrades();
+            return 1;
+        }));
+
     }
 }
