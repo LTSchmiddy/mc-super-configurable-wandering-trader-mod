@@ -1,12 +1,9 @@
 # Better Wandering Trader
 
-## Description 
+## Description
 
-A mod that alters the trades offered by the Wandering Trader and makes them more useful to the player.
-
-The new trades offered by the Wandering Trader include 5 items randomly selected from the "Common-Rare" item trade table and 1 item randomly selected 
-from the "Super-Rare" item trade table.
+A mod that allows the user to completely reconfigure the Wandering Trader's trade options and selection logic.
 
 ## License
 
-This template is available under the CC0 license. Feel free to learn from it and incorporate it in your own projects.
+This project is available under the CC0 license.
