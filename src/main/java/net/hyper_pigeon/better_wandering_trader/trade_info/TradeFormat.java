@@ -1,8 +1,9 @@
-package net.hyper_pigeon.better_wandering_trader.config;
+package net.hyper_pigeon.better_wandering_trader.trade_info;
 
 import java.util.HashMap;
+import java.util.Random;
 
-import net.hyper_pigeon.better_wandering_trader.SellItemFactory;
+import net.hyper_pigeon.better_wandering_trader.interfaces.IUserTradeGenerator;
 import net.minecraft.entity.passive.MerchantEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -42,8 +43,8 @@ public class TradeFormat implements IUserTradeGenerator {
     }
 
     @Override
-    public void addTradeOffers(TradeOfferList tradeOfferList, MerchantEntity merchant) {
-        TradeOffer tradeOffer = getFactory().create(merchant, TradeListUtils.random);
+    public void addTradeOffers(TradeOfferList tradeOfferList, MerchantEntity merchant, Random random) {
+        TradeOffer tradeOffer = getFactory().create(merchant, random);
         if (tradeOffer != null) {
             tradeOfferList.add(tradeOffer);
         }

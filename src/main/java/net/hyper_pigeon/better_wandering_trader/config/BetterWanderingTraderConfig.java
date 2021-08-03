@@ -3,7 +3,6 @@ package net.hyper_pigeon.better_wandering_trader.config;
 import me.shedaniel.autoconfig.ConfigData;
 import me.shedaniel.autoconfig.annotation.Config;
 import me.shedaniel.autoconfig.annotation.ConfigEntry;
-import net.hyper_pigeon.better_wandering_trader.SellItemFactory;
 
 @Config(name = "better_wandering_trader")
 public class BetterWanderingTraderConfig implements ConfigData {
@@ -36,20 +35,5 @@ public class BetterWanderingTraderConfig implements ConfigData {
         public boolean rewrite_default_trades = true;
 
         public String user_trade_lists_folder = "wt_user_trades";
-    }
-
-
-    @ConfigEntry.Gui.Excluded
-    public TradeArray commonTradeFactory = new TradeArray();;
-
-    @ConfigEntry.Gui.Excluded
-    public TradeArray rareTradeFactory = new TradeArray();;
-
-    @ConfigEntry.Gui.Excluded
-    TradeFormat example = new TradeFormat();
-
-    public void WriteDefaultTrades() {
-        commonTradeFactory = TradeArray.fromTradeFactory(SellItemFactory.DefaultCommonTrades);
-        rareTradeFactory = TradeArray.fromTradeFactory(SellItemFactory.DefaultRareTrades);
     }
 }

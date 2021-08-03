@@ -1,10 +1,11 @@
-package net.hyper_pigeon.better_wandering_trader.config;
+package net.hyper_pigeon.better_wandering_trader.trade_info;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 
 import net.fabricmc.loader.api.FabricLoader;
+import net.hyper_pigeon.better_wandering_trader.interfaces.INamedUserTradeGenerator;
 import net.minecraft.entity.passive.MerchantEntity;
 import net.minecraft.village.TradeOfferList;
 
@@ -14,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class UserTradeListConfigHandler {
     public static final String EXAMPLE_FILE_NAME = "example.json";
@@ -24,41 +26,59 @@ public class UserTradeListConfigHandler {
     public static List<UserTradeListConfigFile> userTradeFiles = new ArrayList<UserTradeListConfigFile>();
 
     // Exclusives Info:
-    public static List<UserTradeListConfigFile> exclusiveTradeFiles = new ArrayList<UserTradeListConfigFile>();
+    public static List<INamedUserTradeGenerator> exclusiveTradeGenerators = new ArrayList<INamedUserTradeGenerator>();
     public static float exclusivesTotalWeight = 0;
     
     // Additives Info:
-    public static List<UserTradeListConfigFile> additiveTradeFiles = new ArrayList<UserTradeListConfigFile>();
-    public static float additivesTotalWeight = 0;
-    // public static List<TradeListing> tradeArrays;
+    protected static List<INamedUserTradeGenerator> additiveTradeGenerators = new ArrayList<INamedUserTradeGenerator>();
+    protected static float additivesTotalWeight = 0;
+
+    public static Random configSelectorRandom = new Random();
+
+    public static INamedUserTradeGenerator[] getAdditiveTradeFiles() {
+        INamedUserTradeGenerator[] retVal = new INamedUserTradeGenerator[additiveTradeGenerators.size()];
+        for (int i = 0; i < retVal.length; i++){
+            retVal[i] = additiveTradeGenerators.get(i);
+        }
+        return retVal;
+    }
+
+    public static float getAdditivesTotalWeight() {
+        return additivesTotalWeight;
+    }
 
     public static void addTradeOffers(TradeOfferList tradeOfferList, MerchantEntity merchant) {
+
         // First, select and run an exclusive config:
-        UserTradeListConfigFile selected = selectExclusive();
+        INamedUserTradeGenerator selected = selectExclusive();
         if (selected == null) {
             return;
         }
 
-        System.out.println("Wandering Trader config '" + selected.path.getFileName() + "' selected.");
+        System.out.println("Wandering Trader config '" + selected.getName() + "' selected.");
 
-        selected.addTradeOffers(tradeOfferList, merchant);
-        selected.handleAdditives(additiveTradeFiles, additivesTotalWeight);
+        Random random = new Random();
+        long seed = random.nextLong();
+        System.out.println("Trader Seed: " + seed);
+        random.setSeed(seed);
+
+        selected.addTradeOffers(tradeOfferList, merchant, random);
     }
 
-    public static UserTradeListConfigFile selectExclusive() {
-        float selection = TradeListUtils.random.nextFloat() * exclusivesTotalWeight;
+    public static INamedUserTradeGenerator selectExclusive() {
+        float selection = configSelectorRandom.nextFloat() * exclusivesTotalWeight;
             
-        if (exclusiveTradeFiles.size() < 1) {
+        if (exclusiveTradeGenerators.size() < 1) {
             return null;
         }
 
         float current = 0;
-        for(int i = 0; i < exclusiveTradeFiles.size(); i++) {            
-            current += exclusiveTradeFiles.get(i).getWeight();
+        for(int i = 0; i < exclusiveTradeGenerators.size(); i++) {            
+            current += exclusiveTradeGenerators.get(i).getWeight();
             
             // The first trade where current >= selection is the trade corresponding to selection. Add it, and continue:
             if (current >= selection) {
-                return exclusiveTradeFiles.get(i);
+                return exclusiveTradeGenerators.get(i);
             }
         }
 
@@ -78,8 +98,8 @@ public class UserTradeListConfigHandler {
 
     public static void checkAll(String path) {
         List<UserTradeListConfigFile> checkedTradeFiles = new ArrayList<UserTradeListConfigFile>();
-        List<UserTradeListConfigFile> checkedExclusives = new ArrayList<UserTradeListConfigFile>();
-        List<UserTradeListConfigFile> checkedAdditives = new ArrayList<UserTradeListConfigFile>();
+        List<INamedUserTradeGenerator> checkedExclusives = new ArrayList<INamedUserTradeGenerator>();
+        List<INamedUserTradeGenerator> checkedAdditives = new ArrayList<INamedUserTradeGenerator>();
         readUserTrades(path, checkedTradeFiles);
         processTradeFiles(userTradeFiles, checkedExclusives, checkedAdditives);
 
@@ -88,16 +108,16 @@ public class UserTradeListConfigHandler {
 
     public static void loadAll(String path) {
         userTradeFiles.clear();
-        exclusiveTradeFiles.clear();
-        additiveTradeFiles.clear();
+        exclusiveTradeGenerators.clear();
+        additiveTradeGenerators.clear();
 
         readUserTrades(path, userTradeFiles);
-        processTradeFiles(userTradeFiles, exclusiveTradeFiles, additiveTradeFiles);
+        processTradeFiles(userTradeFiles, exclusiveTradeGenerators, additiveTradeGenerators);
         System.out.println("User Trades Loaded!");
     }
 
     protected static void processTradeFiles(List<UserTradeListConfigFile> tradeFiles,
-            List<UserTradeListConfigFile> exclusives, List<UserTradeListConfigFile> additives) {
+            List<INamedUserTradeGenerator> exclusives, List<INamedUserTradeGenerator> additives) {
         exclusivesTotalWeight = 0;
         additivesTotalWeight = 0;
         
@@ -186,11 +206,32 @@ public class UserTradeListConfigHandler {
         return config;
     }
 
+    public static UserTradeListConfigFile createExampleTradeConfig() {       
+        UserTradeListGroup common_group = new UserTradeListGroup();
+        common_group.label = "Common Trades";
+        common_group.inclusion_mode = UserTradeListGroup.ListInclusionMode.select_random;
+        common_group.select_random_inclusion_options = new UserTradeListGroup.SelectRandomInclusionOptions();
+        common_group.select_random_inclusion_options.count = 5;
+        common_group.trades = SellItemFactory.toTradeFormat(SellItemFactory.DefaultCommonTrades);
+
+        UserTradeListGroup rare_group = new UserTradeListGroup();
+        rare_group.label = "Rare Trades";
+        rare_group.inclusion_mode = UserTradeListGroup.ListInclusionMode.select_random;
+        rare_group.select_random_inclusion_options = new UserTradeListGroup.SelectRandomInclusionOptions();
+        rare_group.select_random_inclusion_options.count = 1;
+        rare_group.trades = SellItemFactory.toTradeFormat(SellItemFactory.DefaultRareTrades);
+
+        UserTradeListConfigFile config = new UserTradeListConfigFile();
+        config.root.label = "Example Config";
+        config.root.trade_groups = new UserTradeListGroup[] { common_group, rare_group };
+        return config;
+    }
+
     public static void setupUserTradesDir(String path) {
         Path userTradesRoot = configRoot.resolve(path);
         userTradesRoot.toFile().mkdirs();
 
         File exampleFile = userTradesRoot.resolve(EXAMPLE_FILE_NAME).toFile();
-        createFile(exampleFile, null);
+        createFile(exampleFile, createExampleTradeConfig());
     }
 }

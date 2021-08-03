@@ -1,10 +1,9 @@
-package net.hyper_pigeon.better_wandering_trader;
+package net.hyper_pigeon.better_wandering_trader.trade_info;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-import net.hyper_pigeon.better_wandering_trader.config.TradeFormat;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
@@ -23,7 +22,7 @@ public class SellItemFactory implements TradeOffers.Factory {
     public int experience;
     public float multiplier;
 
-    public HashMap<String, Integer> enchantments = new HashMap<String, Integer>();
+    public HashMap<String, Integer> enchantments = null; //new HashMap<String, Integer>();
 
     public TradeFormat asTradeFormat() {
         TradeFormat retVal = new TradeFormat();
@@ -83,6 +82,17 @@ public class SellItemFactory implements TradeOffers.Factory {
             tradeOfferStack(), this.maxUses, this.experience, this.multiplier);
     }
 
+    
+    public static TradeFormat[] toTradeFormat(TradeOffers.Factory[] entries) {
+        TradeFormat[] retVal = new TradeFormat[entries.length];
+
+
+        for (int i = 0; i < entries.length; i++){
+            retVal[i] = ((SellItemFactory)entries[i]).asTradeFormat();
+        }
+
+        return retVal;
+    }
 
     // Used to create the default config file:
     public static TradeOffers.Factory[] DefaultCommonTrades = new TradeOffers.Factory[] { 

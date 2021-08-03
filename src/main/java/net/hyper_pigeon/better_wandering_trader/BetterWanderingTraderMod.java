@@ -14,7 +14,7 @@ import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.hyper_pigeon.better_wandering_trader.commands.TradeConfigCommands;
 import net.hyper_pigeon.better_wandering_trader.config.BetterWanderingTraderConfig;
-import net.hyper_pigeon.better_wandering_trader.config.UserTradeListConfigHandler;
+import net.hyper_pigeon.better_wandering_trader.trade_info.UserTradeListConfigHandler;
 
 public class BetterWanderingTraderMod implements ModInitializer, ServerStarted, ServerStopping {
 
@@ -53,7 +53,6 @@ public class BetterWanderingTraderMod implements ModInitializer, ServerStarted, 
 	public static void loadTrades() {
 		if (CONFIG.trades.rewrite_default_trades) {
 			CONFIG.trades.rewrite_default_trades = false;
-			CONFIG.WriteDefaultTrades();
 			CONFIG_HOLDER.save();
 		}
 		if (CONFIG.trades.enable_user_added_trades) {

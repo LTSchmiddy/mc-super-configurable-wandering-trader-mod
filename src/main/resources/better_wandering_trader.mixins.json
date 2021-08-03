@@ -4,11 +4,7 @@
   "package": "net.hyper_pigeon.better_wandering_trader.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "TraderOffersMixin",
     "WanderingTraderEntityMixin"
-  ],
-  "client": [
-    "BetterWanderingTraderMixin"
   ],
   "injectors": {
     "defaultRequire": 1

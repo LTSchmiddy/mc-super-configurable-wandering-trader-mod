@@ -1,5 +1,8 @@
-package net.hyper_pigeon.better_wandering_trader.config;
+package net.hyper_pigeon.better_wandering_trader.trade_info;
 
+import java.util.Random;
+
+import net.hyper_pigeon.better_wandering_trader.interfaces.IUserTradeGenerator;
 import net.minecraft.entity.passive.MerchantEntity;
 import net.minecraft.village.TradeOfferList;
 
@@ -19,7 +22,7 @@ public class UserTradeListGroup implements IUserTradeGenerator {
     }
 
     public static class IndependentRandomInclusionOptions {
-        int count = 0;
+        float out_of = 0;
     }
 
     public float selction_weight = 1;
@@ -80,7 +83,7 @@ public class UserTradeListGroup implements IUserTradeGenerator {
     }
 
     @Override
-    public void addTradeOffers(TradeOfferList tradeOfferList, MerchantEntity merchant) {
+    public void addTradeOffers(TradeOfferList tradeOfferList, MerchantEntity merchant, Random random) {
 
         // Include All:
         if (inclusion_mode == ListInclusionMode.all) {
@@ -88,13 +91,24 @@ public class UserTradeListGroup implements IUserTradeGenerator {
                 if (i == null) {
                     continue;
                 }
-                i.addTradeOffers(tradeOfferList, merchant);
+                i.addTradeOffers(tradeOfferList, merchant, random);
             }
         }
 
         if (inclusion_mode == ListInclusionMode.select_random) {
             TradeListUtils.fillWeightedRandomTradesFromPool(tradeOfferList, merchant, getAllGenerators(),
-                    select_random_inclusion_options.count, getTotalWeight());            
+                    select_random_inclusion_options.count, getTotalWeight(), random);            
+        }
+
+        
+        if (inclusion_mode == ListInclusionMode.independent_random) {
+            for (IUserTradeGenerator i : getAllGenerators()) {
+                float odds = random.nextFloat() * independent_random_inclusion_options.out_of;
+
+                if (odds <= i.getWeight()) {
+                    i.addTradeOffers(tradeOfferList, merchant, random);
+                }
+            }
         }
     }
 

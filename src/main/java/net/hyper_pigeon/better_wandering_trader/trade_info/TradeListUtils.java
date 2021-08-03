@@ -1,4 +1,4 @@
-package net.hyper_pigeon.better_wandering_trader.config;
+package net.hyper_pigeon.better_wandering_trader.trade_info;
 
 import java.util.Iterator;
 import java.util.Optional;
@@ -7,6 +7,7 @@ import java.util.Set;
 
 import com.google.common.collect.Sets;
 
+import net.hyper_pigeon.better_wandering_trader.interfaces.IUserTradeGenerator;
 import net.minecraft.entity.passive.MerchantEntity;
 import net.minecraft.village.TradeOfferList;
 
@@ -16,10 +17,8 @@ public class TradeListUtils {
                 .map(f -> f.substring(filename.lastIndexOf(".") + 1));
     }
 
-    public static transient Random random = new Random();
-
     public static void fillRandomTradesFromPool(TradeOfferList tradeOfferList, MerchantEntity merchant,
-            IUserTradeGenerator[] trades, int count) {
+            IUserTradeGenerator[] trades, int count, Random random) {
         Set<Integer> set = Sets.newHashSet();
 
         if (trades.length == 0) {
@@ -43,23 +42,24 @@ public class TradeListUtils {
 
         while (var9.hasNext()) {
             Integer integer = (Integer) var9.next();
-            trades[integer].addTradeOffers(tradeOfferList, merchant);
+            trades[integer].addTradeOffers(tradeOfferList, merchant, random);
         }
     }
 
+    // Handling Weights:
     public static void fillWeightedRandomTradesFromPool(TradeOfferList tradeOfferList, MerchantEntity merchant,
-            IUserTradeGenerator[] trades, int count) {
+            IUserTradeGenerator[] trades, int count, Random random) {
         // We weren't given the total weight, so we'll calculate it now:
         float total_weight = 0;
         for(IUserTradeGenerator i : trades) {
             if (i == null) {continue;}
             total_weight += i.getWeight();
         }
-        fillWeightedRandomTradesFromPool(tradeOfferList, merchant, trades, count, total_weight);
+        fillWeightedRandomTradesFromPool(tradeOfferList, merchant, trades, count, total_weight, random);
     }
 
     public static void fillWeightedRandomTradesFromPool(TradeOfferList tradeOfferList, MerchantEntity merchant,
-            IUserTradeGenerator[] trades, int count, float total_weight) {
+            IUserTradeGenerator[] trades, int count, float total_weight, Random random) {
         if (trades.length == 0) {
             return;
         }
@@ -88,7 +88,7 @@ public class TradeListUtils {
         Iterator<Integer> var9 = set.iterator();
         while (var9.hasNext()) {
             Integer integer = (Integer) var9.next();
-            trades[integer].addTradeOffers(tradeOfferList, merchant);
+            trades[integer].addTradeOffers(tradeOfferList, merchant, random);
         }
     }
 }
