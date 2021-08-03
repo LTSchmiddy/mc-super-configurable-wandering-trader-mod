@@ -1,15 +1,11 @@
 package net.lt_schmiddy.super_configurable_wandering_trader;
 
 import com.mojang.brigadier.CommandDispatcher;
-
-import me.shedaniel.autoconfig.AutoConfig;
-import me.shedaniel.autoconfig.ConfigHolder;
-import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
 import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.*;
 import net.lt_schmiddy.super_configurable_wandering_trader.commands.TradeConfigCommands;
-import net.lt_schmiddy.super_configurable_wandering_trader.config.BetterWanderingTraderConfig;
+import net.lt_schmiddy.super_configurable_wandering_trader.config.ConfigHandler;
 import net.lt_schmiddy.super_configurable_wandering_trader.generators.TradeItem;
 import net.lt_schmiddy.super_configurable_wandering_trader.generators.TradeGroup;
 import net.lt_schmiddy.super_configurable_wandering_trader.trade_info.TradeConfigHandler;
@@ -20,12 +16,10 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 
 public class BetterWanderingTraderMod implements ModInitializer, ServerStarted, ServerStopping {
 
-	//public static BetterWanderingTraderConfig config = AutoConfig.getConfigHolder(BetterWanderingTraderConfig.class).getConfig();
-	public static ConfigHolder<BetterWanderingTraderConfig> CONFIG_HOLDER = AutoConfig.register(BetterWanderingTraderConfig.class, JanksonConfigSerializer::new);
-	public static BetterWanderingTraderConfig CONFIG = CONFIG_HOLDER.getConfig();
-
 	@Override
 	public void onInitialize() {
+		ConfigHandler.load();
+
 		// This code runs as soon as Minecraft is in a mod-load-ready state.
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
@@ -37,7 +31,11 @@ public class BetterWanderingTraderMod implements ModInitializer, ServerStarted, 
 		TradeConfigHandler.registerGeneratorType("items", TradeItem.class);
 		TradeConfigHandler.registerGeneratorType("groups", TradeGroup.class);
 
-		loadUserTrades();
+		if (!ConfigHandler.config.general.load_configs_on_server_start) {
+			System.out.println("Differing user trade loading until server loads.");
+			loadUserTrades();
+		}
+		ConfigHandler.save();
 	}
 
 	public void registerCommands(CommandDispatcher<ServerCommandSource> dispatcher, boolean dedicated){
@@ -46,19 +44,21 @@ public class BetterWanderingTraderMod implements ModInitializer, ServerStarted, 
 
 	@Override
 	public void onServerStopping(MinecraftServer server) {
-		CONFIG_HOLDER.save();
+		ConfigHandler.save();
 	}
 
 	@Override
 	public void onServerStarted(MinecraftServer server) {
-		loadUserTrades();
+		if (ConfigHandler.config.general.load_configs_on_server_start) {
+			loadUserTrades();
+		}
 	}
 
 	public static void loadUserTrades() {
-		TradeConfigHandler.loadAll(CONFIG.trades.user_trade_lists_folder);
+		TradeConfigHandler.loadAll(ConfigHandler.config.trades.user_trade_lists_folder);
 	}
 
 	public static void checkUserTrades() {
-		TradeConfigHandler.checkAll(CONFIG.trades.user_trade_lists_folder);
+		TradeConfigHandler.checkAll(ConfigHandler.config.trades.user_trade_lists_folder);
 	}
 }

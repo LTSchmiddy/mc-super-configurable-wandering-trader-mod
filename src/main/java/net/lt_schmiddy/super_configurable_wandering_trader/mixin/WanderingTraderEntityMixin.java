@@ -1,8 +1,7 @@
 package net.lt_schmiddy.super_configurable_wandering_trader.mixin;
 
-
-import me.shedaniel.autoconfig.AutoConfig;
-import net.lt_schmiddy.super_configurable_wandering_trader.config.BetterWanderingTraderConfig;
+import net.lt_schmiddy.super_configurable_wandering_trader.config.Config;
+import net.lt_schmiddy.super_configurable_wandering_trader.config.ConfigHandler;
 import net.lt_schmiddy.super_configurable_wandering_trader.trade_info.TradeConfigHandler;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.passive.MerchantEntity;
@@ -51,7 +50,7 @@ public abstract class WanderingTraderEntityMixin extends MerchantEntity {
             return;
         }
 
-        BetterWanderingTraderConfig config = AutoConfig.getConfigHolder(BetterWanderingTraderConfig.class).getConfig();
+        Config config = ConfigHandler.config;
         if (config.trades.enable_base_trades) {
 
             TradeOffers.Factory[] factorys = (TradeOffers.Factory[]) TradeOffers.WANDERING_TRADER_TRADES.get(1);
