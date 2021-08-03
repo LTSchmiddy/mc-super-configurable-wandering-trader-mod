@@ -21,9 +21,6 @@
   "entrypoints": {
     "main": [
       "net.lt_schmiddy.super_configurable_wandering_trader.BetterWanderingTraderMod"
-    ],
-    "modmenu": [
-      "net.lt_schmiddy.super_configurable_wandering_trader.ModMenuIntegration"
     ]
   },
   "mixins": [
