@@ -1,16 +1,17 @@
 {
   "schemaVersion": 1,
-  "id": "better_wandering_trader",
+  "id": "super_configurable_wandering_trader",
   "version": "${version}",
 
-  "name": "Better Wandering Trader",
-  "description": "A mod that that gives the Wandering Trader more useful trades",
+  "name": "Super Configurable Wandering Trader",
+  "description": "A mod that allows the user to completely reconfigure the Wandering Trader's trade options and selection logic.",
   "authors": [
+    "LT_Schmiddy",
     "Hyper_Pigeon"
   ],
   "contact": {
-    "homepage": "https://github.com/HyperPigeon",
-    "sources": "https://github.com/HyperPigeon/better-wandering-trader"
+    "homepage": "https://github.com/LTSchmiddy/mc-super-configurable-wandering-trader-mod",
+    "sources": "https://github.com/LTSchmiddy/mc-super-configurable-wandering-trader-mod"
   },
 
   "license": "CC0-1.0",
@@ -19,14 +20,14 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "net.hyper_pigeon.better_wandering_trader.BetterWanderingTraderMod"
+      "net.lt_schmiddy.super_configurable_wandering_trader.BetterWanderingTraderMod"
     ],
     "modmenu": [
-      "net.hyper_pigeon.better_wandering_trader.ModMenuIntegration"
+      "net.lt_schmiddy.super_configurable_wandering_trader.ModMenuIntegration"
     ]
   },
   "mixins": [
-    "better_wandering_trader.mixins.json"
+    "super_configurable_wandering_trader.mixins.json"
   ],
 
   "depends": {

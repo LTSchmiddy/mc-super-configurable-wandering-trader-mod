@@ -1,9 +1,10 @@
-package net.hyper_pigeon.better_wandering_trader.trade_info;
+package net.lt_schmiddy.super_configurable_wandering_trader.generators;
 
 import java.util.HashMap;
 import java.util.Random;
 
-import net.hyper_pigeon.better_wandering_trader.interfaces.IUserTradeGenerator;
+import net.lt_schmiddy.super_configurable_wandering_trader.interfaces.ITradeGenerator;
+import net.lt_schmiddy.super_configurable_wandering_trader.trade_info.SellItemFactory;
 import net.minecraft.entity.passive.MerchantEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -12,7 +13,7 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.village.TradeOffer;
 import net.minecraft.village.TradeOfferList;
 
-public class TradeFormat implements IUserTradeGenerator {
+public class TradeItem implements ITradeGenerator {
     public float selction_weight = 1;
     public String identifier = "minecraft:end_crystal";
     public int price = 0;

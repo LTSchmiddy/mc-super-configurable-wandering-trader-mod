@@ -1,16 +1,18 @@
-package net.hyper_pigeon.better_wandering_trader.trade_info;
+package net.lt_schmiddy.super_configurable_wandering_trader.generators;
 
 import java.nio.file.Path;
 
-import net.hyper_pigeon.better_wandering_trader.interfaces.INamedUserTradeGenerator;
-import net.hyper_pigeon.better_wandering_trader.interfaces.IUserTradeGenerator;
+import net.lt_schmiddy.super_configurable_wandering_trader.interfaces.INamedTradeGenerator;
+import net.lt_schmiddy.super_configurable_wandering_trader.interfaces.ITradeGenerator;
+import net.lt_schmiddy.super_configurable_wandering_trader.trade_info.TradeListUtils;
+import net.lt_schmiddy.super_configurable_wandering_trader.trade_info.TradeConfigHandler;
 import net.minecraft.entity.passive.MerchantEntity;
 import net.minecraft.village.TradeOfferList;
 
 import java.util.List;
 import java.util.Random;
 
-public class UserTradeListConfigFile implements INamedUserTradeGenerator {
+public class TradeGroupFile implements INamedTradeGenerator {
 
     public transient Path path;
 
@@ -35,7 +37,7 @@ public class UserTradeListConfigFile implements INamedUserTradeGenerator {
     public AdditiveTypeOptions additive_type_options = null;
     public SubconfigTypeOptions subconfig_type_options = null;
 
-    public UserTradeListGroup root = new UserTradeListGroup();
+    public TradeGroup root = new TradeGroup();
 
     public void validate() {
         // Adding type options if missing:
@@ -63,7 +65,7 @@ public class UserTradeListConfigFile implements INamedUserTradeGenerator {
 
 
     // On processing as an exclusive, the additives list will be send here for processing:
-    public boolean handleAdditives(List<UserTradeListConfigFile> additives, float totalWeight, Random random) {
+    public boolean handleAdditives(List<TradeGroupFile> additives, float totalWeight, Random random) {
         // Cases where exclusives shouldn't be processed.    
 
         return true;
@@ -85,9 +87,9 @@ public class UserTradeListConfigFile implements INamedUserTradeGenerator {
         TradeListUtils.fillWeightedRandomTradesFromPool(
             tradeOfferList,
             merchant,
-            UserTradeListConfigHandler.getAdditiveTradeFiles(),
+            TradeConfigHandler.getAdditiveTradeFiles(),
             exclusive_type_options.allow_additive_options.count,
-            UserTradeListConfigHandler.getAdditivesTotalWeight(),
+            TradeConfigHandler.getAdditivesTotalWeight(),
             random
         );
         
@@ -104,7 +106,7 @@ public class UserTradeListConfigFile implements INamedUserTradeGenerator {
     }
 
     // @Override
-    public IUserTradeGenerator[] getAllGenerators() {
+    public ITradeGenerator[] getAllGenerators() {
         return root.getAllGenerators();
     }
 

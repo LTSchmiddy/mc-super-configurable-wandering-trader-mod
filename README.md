@@ -1,4 +1,4 @@
-# Better Wandering Trader
+# Super Configurable Wandering Trader
 
 ## Description
 

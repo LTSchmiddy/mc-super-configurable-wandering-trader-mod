@@ -1,8 +1,8 @@
-package net.hyper_pigeon.better_wandering_trader.commands;
+package net.lt_schmiddy.super_configurable_wandering_trader.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
 
-import net.hyper_pigeon.better_wandering_trader.BetterWanderingTraderMod;
+import net.lt_schmiddy.super_configurable_wandering_trader.BetterWanderingTraderMod;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 
