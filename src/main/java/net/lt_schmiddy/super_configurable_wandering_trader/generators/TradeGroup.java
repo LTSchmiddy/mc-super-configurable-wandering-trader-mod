@@ -8,13 +8,14 @@ import java.util.Random;
 
 import com.google.gson.JsonObject;
 
+import net.lt_schmiddy.super_configurable_wandering_trader.abstracts.ATradeGenerator;
 import net.lt_schmiddy.super_configurable_wandering_trader.interfaces.ITradeGenerator;
-import net.lt_schmiddy.super_configurable_wandering_trader.trade_info.TradeListUtils;
-import net.lt_schmiddy.super_configurable_wandering_trader.trade_info.TradeConfigHandler;
+import net.lt_schmiddy.super_configurable_wandering_trader.trades.TradeConfigHandler;
+import net.lt_schmiddy.super_configurable_wandering_trader.trades.TradeListUtils;
 import net.minecraft.entity.passive.MerchantEntity;
 import net.minecraft.village.TradeOfferList;
 
-public class TradeGroup implements ITradeGenerator {
+public class TradeGroup extends ATradeGenerator {
     // Instance Section:
     public enum ListInclusionMode {
         all, // process all lists.
@@ -23,8 +24,7 @@ public class TradeGroup implements ITradeGenerator {
     }
 
     // Options for inclusion modes:
-    public static class AllInclusionOptions {
-    }
+    public static class AllInclusionOptions {}
 
     public static class SelectRandomInclusionOptions {
         public int count = 0;
@@ -45,11 +45,15 @@ public class TradeGroup implements ITradeGenerator {
     // public TradeFormat trades[] = new TradeFormat[0];
     // public TradeGroup[] trade_groups = new TradeGroup[0];
 
+    public TradeGroupFileReference[] merge_with_files = new TradeGroupFileReference[0];
+
     public transient Map<String, ITradeGenerator[]> loadedGenerators = new HashMap<String, ITradeGenerator[]>();
     public Map<String, JsonObject[]> generators = new HashMap<String, JsonObject[]>();
 
     private transient List<ITradeGenerator> allGenerators;
     private transient float total_weight = -1;
+
+
 
     public void loadGenerators() {
         // Add missing type sections:
@@ -110,7 +114,7 @@ public class TradeGroup implements ITradeGenerator {
     }
 
     public void validate() {
-        loadGenerators();
+
 
         // Adding inclusion options if missing:
         if (inclusion_mode == ListInclusionMode.all) {
@@ -131,15 +135,37 @@ public class TradeGroup implements ITradeGenerator {
             }
         }
 
+
+        // Loading sub-generators:
+        loadGenerators();
+
+        
+
         // Validate any generators:
         for (ITradeGenerator i : getAllGenerators()) {
+            i.setParent(this);
             i.validate();
         }
 
         saveGenerators();
+
+        // Loading Merges:
+        for (TradeGroupFileReference i : merge_with_files) {
+            
+            // Even though we're merging, we're going to use this as the parent to 
+            // indicate where the actual file reference is happening.
+            i.setParent(this);
+            i.validate();
+
+            // Once the reference is set up, we add all its generators to ours.
+            // The reference itself is never added to our generators, however.
+            // We also set much of refs configuration to match ours.
+            if (i.ref != null) {
+                allGenerators.addAll(i.ref.root.allGenerators);
+            }
+        }
     }
 
-    @Override
     public void addTradeOffers(TradeOfferList tradeOfferList, MerchantEntity merchant, Random random) {
 
         // Include All:

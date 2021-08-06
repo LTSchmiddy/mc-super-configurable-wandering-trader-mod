@@ -3,8 +3,8 @@ package net.lt_schmiddy.super_configurable_wandering_trader.generators;
 import java.util.HashMap;
 import java.util.Random;
 
-import net.lt_schmiddy.super_configurable_wandering_trader.interfaces.ITradeGenerator;
-import net.lt_schmiddy.super_configurable_wandering_trader.trade_info.SellItemFactory;
+import net.lt_schmiddy.super_configurable_wandering_trader.abstracts.ATradeGenerator;
+import net.lt_schmiddy.super_configurable_wandering_trader.trades.SellItemFactory;
 import net.minecraft.entity.passive.MerchantEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -13,7 +13,8 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.village.TradeOffer;
 import net.minecraft.village.TradeOfferList;
 
-public class TradeItem implements ITradeGenerator {
+public class TradeItem extends ATradeGenerator {
+
     public float selction_weight = 1;
     public String identifier = "minecraft:end_crystal";
     public int price = 0;

@@ -2,18 +2,17 @@ package net.lt_schmiddy.super_configurable_wandering_trader.generators;
 
 import java.nio.file.Path;
 
-import net.lt_schmiddy.super_configurable_wandering_trader.interfaces.INamedTradeGenerator;
+import net.lt_schmiddy.super_configurable_wandering_trader.abstracts.ANamedTradeGenerator;
 import net.lt_schmiddy.super_configurable_wandering_trader.interfaces.ITradeGenerator;
-import net.lt_schmiddy.super_configurable_wandering_trader.trade_info.TradeListUtils;
-import net.lt_schmiddy.super_configurable_wandering_trader.trade_info.TradeConfigHandler;
+import net.lt_schmiddy.super_configurable_wandering_trader.trades.TradeConfigHandler;
+import net.lt_schmiddy.super_configurable_wandering_trader.trades.TradeListUtils;
 import net.minecraft.entity.passive.MerchantEntity;
 import net.minecraft.village.TradeOfferList;
 
 import java.util.List;
 import java.util.Random;
 
-public class TradeGroupFile implements INamedTradeGenerator {
-
+public class TradeGroupFile extends ANamedTradeGenerator {
     public transient Path path;
 
     public enum ConfigFileType {
@@ -60,6 +59,7 @@ public class TradeGroupFile implements INamedTradeGenerator {
             }
 
         }
+        root.setParent(this);
         root.validate();
     }
 
@@ -74,7 +74,6 @@ public class TradeGroupFile implements INamedTradeGenerator {
     @Override
     public void addTradeOffers(TradeOfferList tradeOfferList, MerchantEntity merchant, Random random) {
         root.addTradeOffers(tradeOfferList, merchant, random);
-
 
         if (
             config_type != ConfigFileType.exclusive 
@@ -110,10 +109,8 @@ public class TradeGroupFile implements INamedTradeGenerator {
         return root.getAllGenerators();
     }
 
-
     @Override
     public String getName() {
-        // TODO Auto-generated method stub
         return path.getFileName().toString();
     }
 }

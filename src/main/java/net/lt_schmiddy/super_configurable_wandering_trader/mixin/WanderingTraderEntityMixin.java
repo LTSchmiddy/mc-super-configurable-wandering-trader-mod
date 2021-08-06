@@ -2,7 +2,7 @@ package net.lt_schmiddy.super_configurable_wandering_trader.mixin;
 
 import net.lt_schmiddy.super_configurable_wandering_trader.config.Config;
 import net.lt_schmiddy.super_configurable_wandering_trader.config.ConfigHandler;
-import net.lt_schmiddy.super_configurable_wandering_trader.trade_info.TradeConfigHandler;
+import net.lt_schmiddy.super_configurable_wandering_trader.trades.TradeConfigHandler;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.passive.MerchantEntity;
 import net.minecraft.entity.passive.WanderingTraderEntity;
@@ -51,6 +51,12 @@ public abstract class WanderingTraderEntityMixin extends MerchantEntity {
         }
 
         Config config = ConfigHandler.config;
+
+        if (config.trades.enable_user_added_trades) {
+            TradeOfferList tradeOfferList = this.offers;
+            TradeConfigHandler.addTradeOffers(tradeOfferList, this);
+        }
+
         if (config.trades.enable_base_trades) {
 
             TradeOffers.Factory[] factorys = (TradeOffers.Factory[]) TradeOffers.WANDERING_TRADER_TRADES.get(1);
@@ -67,10 +73,6 @@ public abstract class WanderingTraderEntityMixin extends MerchantEntity {
             }
         }
 
-        if (config.trades.enable_user_added_trades) {
-            TradeOfferList tradeOfferList = this.offers;
-            TradeConfigHandler.addTradeOffers(tradeOfferList, this);
-        }
     }
     
 }

@@ -1,4 +1,4 @@
-package net.lt_schmiddy.super_configurable_wandering_trader.trade_info;
+package net.lt_schmiddy.super_configurable_wandering_trader.trades;
 
 import java.util.Iterator;
 import java.util.Optional;

@@ -1,4 +1,4 @@
-package net.lt_schmiddy.super_configurable_wandering_trader.trade_info;
+package net.lt_schmiddy.super_configurable_wandering_trader.trades;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -22,6 +22,8 @@ import java.util.Map;
 import java.util.Random;
 
 public class TradeConfigHandler {
+
+    public static String IGNORE_FILE_PREFIX = "_";
 
     public static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     public static Path configRoot = FabricLoader.getInstance().getConfigDir();
@@ -106,6 +108,10 @@ public class TradeConfigHandler {
         }
     }
 
+    public static boolean isIgnoredFile(Path fp) {
+        return fp.getFileName().toString().startsWith(IGNORE_FILE_PREFIX);
+    }
+
     public static void checkAll(String path) {
         List<TradeGroupFile> checkedTradeFiles = new ArrayList<TradeGroupFile>();
         List<INamedTradeGenerator> checkedExclusives = new ArrayList<INamedTradeGenerator>();
@@ -143,6 +149,7 @@ public class TradeConfigHandler {
         }
 
     }
+    
 
     protected static void readUserTrades(String path, List<TradeGroupFile> tradeFiles) {
         Path userTradesRoot = configRoot.resolve(path);
@@ -152,7 +159,10 @@ public class TradeConfigHandler {
         }
         // Scans the User Trades folder for all trade configs.
         try {
-            Files.walk(userTradesRoot).filter(Files::isRegularFile).forEach((Path fp) -> {
+            Files.walk(userTradesRoot)
+            .filter(Files::isRegularFile)
+            .filter((Path fp) -> {return !isIgnoredFile(fp);})
+            .forEach((Path fp) -> {
                 loadAll_ForPath(fp, tradeFiles);
             });
         } catch (IOException e) {
@@ -167,8 +177,7 @@ public class TradeConfigHandler {
         // ignore those:
         if (config == null) {
             return;
-        }
-        config.root.loadGenerators();
+        } 
         config.validate();
         tradeFiles.add(config);
         // We save the file after it has been processed to ensure it has correct
