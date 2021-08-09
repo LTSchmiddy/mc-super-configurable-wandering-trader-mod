@@ -6,10 +6,8 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.*;
 import net.lt_schmiddy.super_configurable_wandering_trader.commands.TradeConfigCommands;
 import net.lt_schmiddy.super_configurable_wandering_trader.config.ConfigHandler;
-import net.lt_schmiddy.super_configurable_wandering_trader.generators.TradeItem;
+import net.lt_schmiddy.super_configurable_wandering_trader.generators.*;
 import net.lt_schmiddy.super_configurable_wandering_trader.trades.TradeConfigHandler;
-import net.lt_schmiddy.super_configurable_wandering_trader.generators.TradeGroup;
-import net.lt_schmiddy.super_configurable_wandering_trader.generators.TradeGroupFileReference;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
@@ -30,6 +28,7 @@ public class BetterWanderingTraderMod implements ModInitializer, ServerStarted, 
 		ServerLifecycleEvents.SERVER_STOPPING.register(this);
 
 		TradeConfigHandler.registerGeneratorType("items", TradeItem.class);
+		TradeConfigHandler.registerGeneratorType("potions", TradePotion.class);
 		TradeConfigHandler.registerGeneratorType("groups", TradeGroup.class);
 		TradeConfigHandler.registerGeneratorType("files", TradeGroupFileReference.class);
 
@@ -46,7 +45,10 @@ public class BetterWanderingTraderMod implements ModInitializer, ServerStarted, 
 
 	@Override
 	public void onServerStopping(MinecraftServer server) {
+		server.getFile(".");
+
 		ConfigHandler.save();
+		TradeConfigHandler.saveTraderQueue(server.getFile("trader_queue.json"));
 	}
 
 	@Override
@@ -54,6 +56,7 @@ public class BetterWanderingTraderMod implements ModInitializer, ServerStarted, 
 		if (ConfigHandler.config.general.load_configs_on_server_start) {
 			loadUserTrades();
 		}
+		TradeConfigHandler.loadTraderQueue(server.getFile("trader_queue.json"));
 	}
 
 	public static void loadUserTrades() {

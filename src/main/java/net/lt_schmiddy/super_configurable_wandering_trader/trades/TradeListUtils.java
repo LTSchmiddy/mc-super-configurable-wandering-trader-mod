@@ -60,9 +60,10 @@ public class TradeListUtils {
 
     public static void fillWeightedRandomTradesFromPool(TradeOfferList tradeOfferList, MerchantEntity merchant,
             ITradeGenerator[] trades, int count, float total_weight, Random random) {
-        if (trades.length == 0) {
+        if (trades.length == 0 || total_weight == 0) {
             return;
         }
+     
         
         // Random selection, but factoring in weights:
         Set<Integer> set = Sets.newHashSet();

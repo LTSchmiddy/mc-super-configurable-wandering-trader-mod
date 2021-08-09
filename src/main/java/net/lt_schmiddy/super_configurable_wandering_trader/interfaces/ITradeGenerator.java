@@ -12,5 +12,11 @@ public interface ITradeGenerator {
 
     public void validate();
     public void addTradeOffers(TradeOfferList tradeOfferList, MerchantEntity merchant, Random random);
-    public float getWeight();
+    default public float getWeight() {
+        return 1;
+    }
+
+    default public int getSortOrder() {
+        return 0;
+    }
 }

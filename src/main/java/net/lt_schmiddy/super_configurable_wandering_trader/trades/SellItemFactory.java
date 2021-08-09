@@ -16,9 +16,8 @@ import net.minecraft.village.TradeOffer;
 import net.minecraft.village.TradeOffers;
 
 public class SellItemFactory implements TradeOffers.Factory {
-    public ItemStack sell;
+    public ItemStack sellStack;
     public int price;
-    public int count;
     public int maxUses;
     public int experience;
     public float multiplier;
@@ -27,9 +26,9 @@ public class SellItemFactory implements TradeOffers.Factory {
 
     public TradeItem asTradeFormat() {
         TradeItem retVal = new TradeItem();
-        retVal.identifier = Registry.ITEM.getId(sell.getItem()).toString();
+        retVal.identifier = Registry.ITEM.getId(sellStack.getItem()).toString();
         retVal.price = price;
-        retVal.count = count;
+        retVal.count = sellStack.getCount();
         retVal.maxUses = maxUses;
         retVal.experience = experience;
         retVal.enchantments = enchantments;
@@ -41,40 +40,36 @@ public class SellItemFactory implements TradeOffers.Factory {
         this(new ItemStack(block), p_price, p_count, p_maxUses, p_experience);
     }
 
-    public SellItemFactory(Item item, int i, int j, int k) {
-        this((ItemStack) (new ItemStack(item)), i, j, 12, k);
-    }
-
     public SellItemFactory(Item item, int p_price, int p_count, int p_maxUses, int p_experience) {
         this(new ItemStack(item),  p_price, p_count, p_maxUses, p_experience);
     }
 
-    public SellItemFactory(Item item, int p_price, int p_count, int p_maxUses, int p_experience, HashMap<String, Integer> p_enchantments) {
-        this(new ItemStack(item),  p_price, p_count, p_maxUses, p_experience);
-        enchantments = p_enchantments;
+    public SellItemFactory(Item p_item, int p_price, int p_count, int p_maxUses, int p_experience, HashMap<String, Integer> p_enchantments) {
+        this(new ItemStack(p_item, p_count),  p_price, p_maxUses, p_experience);
+
+        if (enchantments != null) {
+            for (Map.Entry<String, Integer> i: enchantments.entrySet()){
+                sellStack.addEnchantment(Registry.ENCHANTMENT.get(new Identifier(i.getKey())), i.getValue());
+            }
+        }
     }
 
-    public SellItemFactory(ItemStack itemStack, int p_price, int p_count, int p_maxUses, int p_experience) {
-        this(itemStack, p_price, p_count, p_maxUses, p_experience, 0.05F);
+    public SellItemFactory(ItemStack itemStack, int p_price, int p_maxUses, int p_experience) {
+        this(itemStack, p_price, p_maxUses, p_experience, 0.05F);
     }
 
-    public SellItemFactory(ItemStack itemStack, int price, int count, int maxUses, int experience,
+    public SellItemFactory(ItemStack itemStack, int price, int maxUses, int experience,
             float multiplier) {
-        this.sell = itemStack;
+        this.sellStack = itemStack;
         this.price = price;
-        this.count = count;
         this.maxUses = maxUses;
         this.experience = experience;
         this.multiplier = multiplier;
     }
 
     public ItemStack tradeOfferStack() {
-        ItemStack retVal = new ItemStack(this.sell.getItem(), this.count);
-        if (enchantments != null) {
-            for (Map.Entry<String, Integer> i: enchantments.entrySet()){
-                retVal.addEnchantment(Registry.ENCHANTMENT.get(new Identifier(i.getKey())), i.getValue());
-            }
-        }
+        ItemStack retVal = sellStack.copy();
+
         return retVal;
     }
 

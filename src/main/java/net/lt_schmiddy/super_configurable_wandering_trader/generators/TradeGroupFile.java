@@ -113,4 +113,10 @@ public class TradeGroupFile extends ANamedTradeGenerator {
     public String getName() {
         return path.getFileName().toString();
     }
+
+
+    @Override
+    public int getSortOrder() {
+        return root.getSortOrder();
+    }
 }

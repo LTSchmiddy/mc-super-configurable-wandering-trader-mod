@@ -23,6 +23,7 @@ import java.util.Random;
 
 public class TradeConfigHandler {
 
+    public static String TRADER_QUEUE_FILE_NAME = "trader_queue.json";
     public static String IGNORE_FILE_PREFIX = "_";
 
     public static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -47,6 +48,36 @@ public class TradeConfigHandler {
 
     public static Random configSelectorRandom = new Random();
 
+    public static TraderQueue queue = new TraderQueue();
+
+
+    public static int loadTraderQueue(File queueFile) {
+        FileReader reader;
+        
+        try {
+            reader = new FileReader(queueFile);
+        } catch (FileNotFoundException e) {
+            return -1;
+        }
+
+        queue = gson.fromJson(reader, TraderQueue.class);
+        return 1;
+    }
+
+    public static int saveTraderQueue(File queueFile) {
+        String json = gson.toJson(queue);
+        
+        try {
+            FileOutputStream stream = new FileOutputStream(queueFile);
+            stream.write(json.getBytes(StandardCharsets.UTF_8));
+            stream.close();
+        } catch (IOException e) {
+            System.out.println("Error occurred while saving queue file: " + e.getMessage());
+            return -1;
+        }
+        return 1;
+    }
+
     public static INamedTradeGenerator[] getAdditiveTradeFiles() {
         INamedTradeGenerator[] retVal = new INamedTradeGenerator[additiveTradeGenerators.size()];
         for (int i = 0; i < retVal.length; i++){
@@ -61,8 +92,18 @@ public class TradeConfigHandler {
 
     public static void addTradeOffers(TradeOfferList tradeOfferList, MerchantEntity merchant) {
 
+        var next = queue.getNext();
+        
+
+
         // First, select and run an exclusive config:
-        INamedTradeGenerator selected = selectExclusive();
+        INamedTradeGenerator selected;
+
+        if (next != null) {
+            selected = next.getGenerator();
+        } else {
+            selected = selectExclusive();
+        }
         if (selected == null) {
             return;
         }
@@ -70,7 +111,12 @@ public class TradeConfigHandler {
         System.out.println("Wandering Trader config '" + selected.getName() + "' selected.");
 
         Random random = new Random();
-        long seed = random.nextLong();
+        long seed;
+        if (next != null && next.seed != null) {
+            seed = next.seed;   
+        } else {
+            seed = random.nextLong();
+        }
         System.out.println("Trader Seed: " + seed);
         random.setSeed(seed);
 
@@ -150,7 +196,6 @@ public class TradeConfigHandler {
 
     }
     
-
     protected static void readUserTrades(String path, List<TradeGroupFile> tradeFiles) {
         Path userTradesRoot = configRoot.resolve(path);
         // Create the trade folder if not present:
@@ -172,19 +217,25 @@ public class TradeConfigHandler {
 
     private static void loadAll_ForPath(Path path, List<TradeGroupFile> tradeFiles) {
         File configFile = path.toFile();
+        TradeGroupFile config = loadConfigFromFile(configFile);
+        tradeFiles.add(config);
+    }
+
+    public static TradeGroupFile loadConfigFromFile(File configFile) {
         TradeGroupFile config = loadFile(configFile);
         // loadFile will return null if the config was malformed, since we want to
         // ignore those:
         if (config == null) {
-            return;
+            return null;
         } 
         config.validate();
-        tradeFiles.add(config);
         // We save the file after it has been processed to ensure it has correct
         // formatting:
         saveFile(configFile, config);
-    }
 
+        return config;
+
+    }
     public static TradeGroupFile loadFile(File configFile) {
         TradeGroupFile config;
 

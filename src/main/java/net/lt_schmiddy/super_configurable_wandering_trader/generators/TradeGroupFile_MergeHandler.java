@@ -3,12 +3,12 @@ package net.lt_schmiddy.super_configurable_wandering_trader.generators;
 import java.nio.file.Path;
 import java.util.Random;
 
-import net.lt_schmiddy.super_configurable_wandering_trader.abstracts.AWeightedAndSortedTradeGenerator;
+import net.lt_schmiddy.super_configurable_wandering_trader.abstracts.ATradeGenerator;
 import net.lt_schmiddy.super_configurable_wandering_trader.trades.TradeConfigHandler;
 import net.minecraft.entity.passive.MerchantEntity;
 import net.minecraft.village.TradeOfferList;
 
-public class TradeGroupFileReference extends AWeightedAndSortedTradeGenerator {
+public class TradeGroupFile_MergeHandler extends ATradeGenerator {
 
     public String relative_path = "";
 
@@ -27,16 +27,16 @@ public class TradeGroupFileReference extends AWeightedAndSortedTradeGenerator {
     @Override
     public void validate() {
         refPath = getRelativeDir().resolve(relative_path);
-        System.out.println("Reference Path: " + refPath);
+        System.out.println("Merge Path: " + refPath);
 
         // Attempt to load the referenced file:
         loadRef();
         if (ref == null) {
-            System.out.println("ERROR in '" + getRootName() + "': the file path '" + refPath + "' could not be used.");
+            System.out.println("ERROR in '" + getRootName() + "': the merge file path '" + refPath + "' could not be used.");
             return;
         }
 
-        System.out.println(getRootName() + ": referenced file path '" + refPath + "' has been loaded.");
+        System.out.println(getRootName() + ": merge file path '" + refPath + "' has been loaded.");
 
         if (TradeConfigHandler.isIgnoredFile(refPath)){
             ref.config_type = TradeGroupFile.ConfigFileType.subconfig;
@@ -51,8 +51,7 @@ public class TradeGroupFileReference extends AWeightedAndSortedTradeGenerator {
 
     @Override
     public void addTradeOffers(TradeOfferList tradeOfferList, MerchantEntity merchant, Random random) {
-        if (ref == null) {return;}
-        ref.addTradeOffers(tradeOfferList, merchant, random);
-        
+        // Never used.
+        return;
     }
 }

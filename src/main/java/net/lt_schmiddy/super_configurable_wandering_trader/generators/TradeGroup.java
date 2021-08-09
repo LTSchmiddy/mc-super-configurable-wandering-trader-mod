@@ -1,6 +1,7 @@
 package net.lt_schmiddy.super_configurable_wandering_trader.generators;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.Random;
 import com.google.gson.JsonObject;
 
 import net.lt_schmiddy.super_configurable_wandering_trader.abstracts.ATradeGenerator;
+import net.lt_schmiddy.super_configurable_wandering_trader.interfaces.INamedTradeGenerator;
 import net.lt_schmiddy.super_configurable_wandering_trader.interfaces.ITradeGenerator;
 import net.lt_schmiddy.super_configurable_wandering_trader.trades.TradeConfigHandler;
 import net.lt_schmiddy.super_configurable_wandering_trader.trades.TradeListUtils;
@@ -34,27 +36,24 @@ public class TradeGroup extends ATradeGenerator {
         float out_of = 0;
     }
 
-    public float selction_weight = 1;
+    // Serialized Values:
     public String label = "";
-
+    public float selction_weight = 1;
+    public Integer sort_order = 0;
     public ListInclusionMode inclusion_mode = ListInclusionMode.all;
     public AllInclusionOptions all_inclusion_options = null;
     public SelectRandomInclusionOptions select_random_inclusion_options = null;
     public IndependentRandomInclusionOptions independent_random_inclusion_options = null;
-
-    // public TradeFormat trades[] = new TradeFormat[0];
-    // public TradeGroup[] trade_groups = new TradeGroup[0];
-
-    public TradeGroupFileReference[] merge_with_files = new TradeGroupFileReference[0];
-
-    public transient Map<String, ITradeGenerator[]> loadedGenerators = new HashMap<String, ITradeGenerator[]>();
+    public TradeGroupFile_MergeHandler[] merge_with_files = new TradeGroupFile_MergeHandler[0];
     public Map<String, JsonObject[]> generators = new HashMap<String, JsonObject[]>();
+
+    // Runtime Values:
+    public transient Map<String, ITradeGenerator[]> loadedGenerators = new HashMap<String, ITradeGenerator[]>();
 
     private transient List<ITradeGenerator> allGenerators;
     private transient float total_weight = -1;
 
-
-
+    
     public void loadGenerators() {
         // Add missing type sections:
         for (String i : TradeConfigHandler.generatorTypes.keySet()) {
@@ -114,7 +113,12 @@ public class TradeGroup extends ATradeGenerator {
     }
 
     public void validate() {
-
+        // If this is a root group, hide the sort order selection:
+        if (getParent() instanceof INamedTradeGenerator) {
+            sort_order = null;
+        } else if (sort_order == null) {
+            sort_order = 0;
+        }
 
         // Adding inclusion options if missing:
         if (inclusion_mode == ListInclusionMode.all) {
@@ -135,11 +139,8 @@ public class TradeGroup extends ATradeGenerator {
             }
         }
 
-
         // Loading sub-generators:
-        loadGenerators();
-
-        
+        loadGenerators();       
 
         // Validate any generators:
         for (ITradeGenerator i : getAllGenerators()) {
@@ -150,7 +151,7 @@ public class TradeGroup extends ATradeGenerator {
         saveGenerators();
 
         // Loading Merges:
-        for (TradeGroupFileReference i : merge_with_files) {
+        for (TradeGroupFile_MergeHandler i : merge_with_files) {
             
             // Even though we're merging, we're going to use this as the parent to 
             // indicate where the actual file reference is happening.
@@ -164,6 +165,19 @@ public class TradeGroup extends ATradeGenerator {
                 allGenerators.addAll(i.ref.root.allGenerators);
             }
         }
+
+        allGenerators.sort(new Comparator<ITradeGenerator>() {
+            @Override
+            public int compare(ITradeGenerator o1, ITradeGenerator o2) {
+                int r1 = o1.getSortOrder();
+                int r2 =  o2.getSortOrder();
+                
+                if (r1 > r2) { return 1; }
+                else if (r1 < r2) { return -1; }
+                else /* meaning (r1 == r2)*/ { return 0; }
+                
+            }
+        });
     }
 
     public void addTradeOffers(TradeOfferList tradeOfferList, MerchantEntity merchant, Random random) {
@@ -174,7 +188,11 @@ public class TradeGroup extends ATradeGenerator {
                 if (i == null) {
                     continue;
                 }
-                i.addTradeOffers(tradeOfferList, merchant, random);
+
+                // If selection weight is 0, we skip.
+                if (i.getWeight() > 0) {
+                    i.addTradeOffers(tradeOfferList, merchant, random);
+                }
             }
         }
 
@@ -201,16 +219,23 @@ public class TradeGroup extends ATradeGenerator {
     }
 
     public float getTotalWeight() {
-        if (total_weight < 0) {
             // meaning that we've not calculated the total_weight yet:
-            total_weight = 0;
-            for (ITradeGenerator i : getAllGenerators()) {
-                if (i == null) {
-                    continue;
-                }
-                total_weight += i.getWeight();
+        total_weight = 0;
+        for (ITradeGenerator i : getAllGenerators()) {
+            if (i == null) {
+                continue;
             }
+            total_weight += i.getWeight();
         }
+        
         return total_weight;
+    }
+
+    @Override
+    public int getSortOrder() {
+        if (sort_order == null) {
+            return 0;
+        }
+        return sort_order;
     }
 }

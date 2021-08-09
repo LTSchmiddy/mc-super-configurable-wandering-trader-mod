@@ -9,6 +9,8 @@ import net.lt_schmiddy.super_configurable_wandering_trader.interfaces.INamedTrad
 import net.lt_schmiddy.super_configurable_wandering_trader.interfaces.ITradeGenerator;
 
 public abstract class ATradeGenerator implements ITradeGenerator {
+
+    
     private transient ITradeGenerator parent = null;
 
     public ITradeGenerator getRoot() {
