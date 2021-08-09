@@ -1,6 +1,7 @@
 package net.lt_schmiddy.super_configurable_wandering_trader.trades;
 
 import net.lt_schmiddy.super_configurable_wandering_trader.generators.TradeGroupFile;
+import net.lt_schmiddy.super_configurable_wandering_trader.factories.SellItemFactory;
 import net.lt_schmiddy.super_configurable_wandering_trader.generators.TradeGroup;
 import net.minecraft.item.Items;
 import net.minecraft.village.TradeOffers;

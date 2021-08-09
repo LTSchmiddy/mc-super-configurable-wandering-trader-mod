@@ -3,7 +3,7 @@ package net.lt_schmiddy.super_configurable_wandering_trader.generators;
 import java.util.Random;
 
 import net.lt_schmiddy.super_configurable_wandering_trader.abstracts.AWeightedAndSortedTradeGenerator;
-import net.lt_schmiddy.super_configurable_wandering_trader.trades.SellItemFactory;
+import net.lt_schmiddy.super_configurable_wandering_trader.factories.SellItemFactory;
 import net.minecraft.entity.passive.MerchantEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;

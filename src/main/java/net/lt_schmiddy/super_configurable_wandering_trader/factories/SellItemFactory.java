@@ -1,4 +1,4 @@
-package net.lt_schmiddy.super_configurable_wandering_trader.trades;
+package net.lt_schmiddy.super_configurable_wandering_trader.factories;
 
 import java.util.HashMap;
 import java.util.Map;

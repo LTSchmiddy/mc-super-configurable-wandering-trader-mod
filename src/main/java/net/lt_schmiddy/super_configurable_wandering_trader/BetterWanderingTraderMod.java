@@ -29,6 +29,7 @@ public class BetterWanderingTraderMod implements ModInitializer, ServerStarted, 
 
 		TradeConfigHandler.registerGeneratorType("items", TradeItem.class);
 		TradeConfigHandler.registerGeneratorType("potions", TradePotion.class);
+		TradeConfigHandler.registerGeneratorType("enchantments", TradeEnchantment.class);
 		TradeConfigHandler.registerGeneratorType("groups", TradeGroup.class);
 		TradeConfigHandler.registerGeneratorType("files", TradeGroupFileReference.class);
 
